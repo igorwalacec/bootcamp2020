@@ -29,6 +29,15 @@ function validateRepository(request, response, next) {
   }
 }
 
+function validateRepositoryId(request, response, next) {
+  const { id } = request.params;
+
+  if (!isUuid(id)) {
+    return response.status(400).json({ error: "Invalid project ID." });
+  } else {
+    return next();
+  }
+}
 const repositories = [];
 
 // A rota deve receber title, url e techs dentro do corpo da requisição, sendo a URL o link para o github desse repositório. Ao cadastrar um novo projeto, ele deve ser armazenado dentro de um objeto no seguinte formato: { id: "uuid", title: 'Desafio Node.js', url: 'http://github.com/...', techs: ["Node.js", "..."], likes: 0 }; Certifique-se que o ID seja um UUID, e de sempre iniciar os likes como 0.
@@ -52,9 +61,28 @@ app.post("/repositories", validateRepository, (request, response) => {
   return response.status(201).json(repository);
 });
 
-app.put("/repositories/:id", validateRepository, (request, response) => {
-  // TODO
-});
+app.put(
+  "/repositories/:id",
+  validateRepositoryId,
+  validateRepository,
+  (request, response) => {
+    const { id } = request.params;
+    const { title, url, techs = [] } = request.body;
+
+    const repositoryIndex = repositories.findIndex(
+      (repository) => repository.id === id
+    );
+
+    if (repositoryIndex < 0) {
+      return response.status(400).json({ error: "Repository not found." });
+    } else {
+      repositories[repositoryIndex].title = title;
+      repositories[repositoryIndex].url = url;
+      repositories[repositoryIndex].techs = techs;
+      return response.json(repositories[repositoryIndex]);
+    }
+  }
+);
 
 app.delete("/repositories/:id", (request, response) => {
   // TODO
