@@ -22,19 +22,19 @@ function validateRepository(request, response, next) {
   if (validations.length == 0) {
     return next();
   } else {
-    return response
-      .status(400)
-      .json({
-        message: "Validate the following items.",
-        validations: validations,
-      });
+    return response.status(400).json({
+      message: "Validate the following items.",
+      validations: validations,
+    });
   }
 }
 
 const repositories = [];
 
 // A rota deve receber title, url e techs dentro do corpo da requisição, sendo a URL o link para o github desse repositório. Ao cadastrar um novo projeto, ele deve ser armazenado dentro de um objeto no seguinte formato: { id: "uuid", title: 'Desafio Node.js', url: 'http://github.com/...', techs: ["Node.js", "..."], likes: 0 }; Certifique-se que o ID seja um UUID, e de sempre iniciar os likes como 0.
-app.get("/repositories", (request, response) => {});
+app.get("/repositories", (request, response) => {
+  return response.json(repositories);
+});
 
 app.post("/repositories", validateRepository, (request, response) => {
   const { title, url, techs = [] } = request.body;
@@ -49,7 +49,7 @@ app.post("/repositories", validateRepository, (request, response) => {
 
   repositories.push(repository);
 
-  return response.json(repository);
+  return response.status(201).json(repository);
 });
 
 app.put("/repositories/:id", validateRepository, (request, response) => {
