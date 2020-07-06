@@ -1,5 +1,5 @@
 export default class Error {
-  private readonly message: string;
+  public readonly message: string;
 
   public readonly statusCode: number;
 
